@@ -1,0 +1,351 @@
+ {
+	  "AWSTemplateFormatVersion": "2010-09-09",
+	   "Description": "Simple template to create an EC2 instance",
+	    "Parameters": {
+		    	"InstanceType": {
+						"Description": "Instance Type",
+								"Type": "String",
+										"Default": "t2.micro",
+												"AllowedValues": [ "t2.micro", "t2.small","t3.micro" ]
+													},
+														"Keypair": {
+																	"Description": "Name of the Keypair",
+																			"Type": "AWS::EC2::KeyPair::KeyName"
+																				},
+																					"ImageID": {
+																								"Description": "AMI ID",
+																										"Type": "String",
+																												"Default": "ami-02f706d959cedf892",
+																														"AllowedValues": [ "ami-0b898040803850657", "ami-02f706d959cedf892" ]
+																															}
+
+																															 },
+																															  "Resources": {
+
+
+																																      "MyVPC":{
+
+																																	               "Type":"AWS::EC2::VPC",
+																																		                     "Properties":
+																																				     	      {
+																																						                    "CidrBlock" : "172.31.0.0/16",
+																																								                  "EnableDnsSupport" : "True",
+																																										                "EnableDnsHostnames" : "True",
+																																												              "InstanceTenancy" : "default"
+																																													                    }
+
+																																															    },
+
+
+
+
+																																															          "myInternetGateway" :
+																																																       {
+																																																	            "Type": "AWS::EC2::InternetGateway",
+
+																																																		          "Properties" : {
+																																																				          "Tags" : [ {"Key" : "Y", "Value" : "IG"}]
+																																																					        }
+																																																						   },
+
+
+
+																																																						      "VPCGatewayAttachment" :
+
+																																																						         {
+																																																								       "Type" : "AWS::EC2::VPCGatewayAttachment",
+																																																								             "Properties" : {
+																																																										           "InternetGatewayId" : { "Ref" : "myInternetGateway"},
+																																																											         "VpcId" : { "Ref" :"MyVPC" }
+
+
+																																																												    }
+
+																																																												    },
+
+
+
+
+
+
+
+
+
+
+																																																												    "mySubnet1" : {
+																																																													       "Type" : "AWS::EC2::Subnet",
+																																																													          "Properties" : {
+																																																															        "VpcId" : { "Ref" : "MyVPC" },
+																																																																      "CidrBlock" : "172.31.0.0/24",
+																																																																            "AvailabilityZone" : "us-east-2a",
+																																																																	          "Tags" : [ { "Key" : "Y", "Value" : "Subnet1" } ]
+																																																																		     }
+																																																																		     },
+
+
+
+
+
+
+																																																																		     "myRouteTable1" : {
+																																																																			        "Type" : "AWS::EC2::RouteTable",
+																																																																				   "Properties" : {
+																																																																					         "VpcId" : { "Ref" : "MyVPC" },
+																																																																						       "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+																																																																						          }
+																																																																							  },
+
+
+
+
+
+																																																																							  "myRoute1" : {
+																																																																								     "Type" : "AWS::EC2::Route",
+																																																																								        "DependsOn" : "myInternetGateway",
+																																																																									   "Properties" : {
+																																																																										         "RouteTableId" : { "Ref" : "myRouteTable1" },
+																																																																											       "DestinationCidrBlock" : "0.0.0.0/0",
+																																																																											             "GatewayId" : { "Ref" : "myInternetGateway" }
+																																																																												        }
+																																																																													},
+
+
+
+
+
+																																																																													"mySubnetRouteTableAssociation1" : {
+																																																																														   "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+																																																																														      "Properties" : {
+																																																																															            "SubnetId" : { "Ref" : "mySubnet1" },
+																																																																																          "RouteTableId" : { "Ref" : "myRouteTable1" }
+																																																																																	     }
+																																																																																	     },
+
+
+
+																																																																																	     "mySubnet2" : {
+																																																																																		        "Type" : "AWS::EC2::Subnet",
+																																																																																			   "Properties" : {
+																																																																																				         "VpcId" : { "Ref" : "MyVPC" },
+																																																																																					       "CidrBlock" : "172.31.1.0/24",
+																																																																																					             "AvailabilityZone" : "us-east-2a",
+																																																																																						           "Tags" : [ { "Key" : "Y", "Value" : "Subnet2" } ]
+																																																																																							      }
+																																																																																							      },
+
+
+
+
+
+
+																																																																																							      "myRouteTable2" : {
+																																																																																								         "Type" : "AWS::EC2::RouteTable",
+																																																																																									    "Properties" : {
+																																																																																										          "VpcId" : { "Ref" : "MyVPC" },
+																																																																																											        "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+																																																																																												   }
+																																																																																												   },
+
+
+
+
+
+																																																																																												   "myRoute2" : {
+																																																																																													      "Type" : "AWS::EC2::Route",
+																																																																																													         "DependsOn" : "myInternetGateway",
+																																																																																														    "Properties" : {
+																																																																																															          "RouteTableId" : { "Ref" : "myRouteTable2" },
+																																																																																																        "DestinationCidrBlock" : "0.0.0.0/0",
+																																																																																																	      "GatewayId" : { "Ref" : "myInternetGateway" }
+																																																																																																	         }
+																																																																																																		 },
+
+
+
+
+
+																																																																																																		 "mySubnetRouteTableAssociation2" : {
+																																																																																																			    "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+																																																																																																			       "Properties" : {
+																																																																																																				             "SubnetId" : { "Ref" : "mySubnet2" },
+																																																																																																					           "RouteTableId" : { "Ref" : "myRouteTable2" }
+																																																																																																						      }
+																																																																																																						      },
+
+
+																																																																																																						      "mySubnet3" : {
+																																																																																																							         "Type" : "AWS::EC2::Subnet",
+																																																																																																								    "Properties" : {
+																																																																																																									          "VpcId" : { "Ref" : "MyVPC" },
+																																																																																																										        "CidrBlock" : "172.31.3.0/24",
+																																																																																																											      "AvailabilityZone" : "us-east-2a",
+																																																																																																											            "Tags" : [ { "Key" : "Y", "Value" : "Subnet3" } ]
+																																																																																																												       }
+																																																																																																												       },
+
+
+
+
+
+
+																																																																																																												       "myRouteTable3" : {
+																																																																																																													          "Type" : "AWS::EC2::RouteTable",
+																																																																																																														     "Properties" : {
+																																																																																																															           "VpcId" : { "Ref" : "MyVPC" },
+																																																																																																																         "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+																																																																																																																	    }
+																																																																																																																	    },
+
+
+
+
+
+																																																																																																																	    "myRoute3" : {
+																																																																																																																		       "Type" : "AWS::EC2::Route",
+																																																																																																																		          "DependsOn" : "myInternetGateway",
+																																																																																																																			     "Properties" : {
+																																																																																																																				           "RouteTableId" : { "Ref" : "myRouteTable3" },
+																																																																																																																					         "DestinationCidrBlock" : "0.0.0.0/0",
+																																																																																																																						       "GatewayId" : { "Ref" : "myInternetGateway" }
+																																																																																																																						          }
+																																																																																																																							  },
+
+
+
+
+
+																																																																																																																							  "mySubnetRouteTableAssociation3" : {
+																																																																																																																								     "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+																																																																																																																								        "Properties" : {
+																																																																																																																										      "SubnetId" : { "Ref" : "mySubnet3" },
+																																																																																																																										            "RouteTableId" : { "Ref" : "myRouteTable3" }
+																																																																																																																											       }
+																																																																																																																											       },
+
+																																																																																																																											       "mySubnet4" : {
+																																																																																																																												          "Type" : "AWS::EC2::Subnet",
+																																																																																																																													     "Properties" : {
+																																																																																																																														           "VpcId" : { "Ref" : "MyVPC" },
+																																																																																																																															         "CidrBlock" : "172.31.4.0/24",
+																																																																																																																																       "AvailabilityZone" : "us-east-2a",
+																																																																																																																																             "Tags" : [ { "Key" : "Y", "Value" : "Subnet4" } ]
+																																																																																																																																	        }
+																																																																																																																																		},
+
+
+
+
+
+
+																																																																																																																																		"myRouteTable4" : {
+																																																																																																																																			   "Type" : "AWS::EC2::RouteTable",
+																																																																																																																																			      "Properties" : {
+																																																																																																																																				            "VpcId" : { "Ref" : "MyVPC" },
+																																																																																																																																					          "Tags" : [ { "Key" : "foo", "Value" : "bar" } ]
+																																																																																																																																						     }
+																																																																																																																																						     },
+
+
+
+
+
+																																																																																																																																						     "myRoute4" : {
+																																																																																																																																							        "Type" : "AWS::EC2::Route",
+																																																																																																																																								   "DependsOn" : "myInternetGateway",
+																																																																																																																																								      "Properties" : {
+																																																																																																																																									            "RouteTableId" : { "Ref" : "myRouteTable4" },
+																																																																																																																																										          "DestinationCidrBlock" : "0.0.0.0/0",
+																																																																																																																																											        "GatewayId" : { "Ref" : "myInternetGateway" }
+																																																																																																																																												   }
+																																																																																																																																												   },
+
+
+
+
+
+																																																																																																																																												   "mySubnetRouteTableAssociation4" : {
+																																																																																																																																													      "Type" : "AWS::EC2::SubnetRouteTableAssociation",
+																																																																																																																																													         "Properties" : {
+																																																																																																																																															       "SubnetId" : { "Ref" : "mySubnet4" },
+																																																																																																																																															             "RouteTableId" : { "Ref" : "myRouteTable4" }
+																																																																																																																																																        }
+																																																																																																																																																	},
+
+
+
+
+
+
+																																																																																																																																																		"MyEc2Instance": {
+																																																																																																																																																					"Type": "AWS::EC2::Instance",
+																																																																																																																																																							"DependsOn" : "MySecurityGroups",
+																																																																																																																																																							                "Properties": {
+																																																																																																																																																													"InstanceType": { "Ref": "InstanceType" },
+																																																																																																																																																																"KeyName": { "Ref": "Keypair" },
+																																																																																																																																																																			"ImageId": {"Ref": "ImageID"},
+																																																																																																																																																																						"NetworkInterfaces" : [ { "AssociatePublicIpAddress" : "True",
+																																																																																																																																																																										                          "DeleteOnTermination" : "True",
+																																																																																																																																																																													  			                          "SubnetId" : {"Ref" : "mySubnet1"},
+																																																																																																																																																																																			  						  "GroupSet" : [ { "Ref" : "MySecurityGroups"} ],
+																																																																																																																																																																																									  						  "DeviceIndex" : "0"
+																																																																																																																																																																																															  						}
+																																																																																																																																																																																																											]
+
+																																																																																																																																																																																																													}
+
+																																																																																																																																																																																																														},
+																																																																																																																																																																																																															"MySecurityGroups": {
+																																																																																																																																																																																																																	            "Type": "AWS::EC2::SecurityGroup",
+																																																																																																																																																																																																																		    		     "Properties": {
+																																																																																																																																																																																																																					     		               "GroupDescription":"cfnY SecurityGroup",
+																																																																																																																																																																																																																								       			       "GroupName":"cfnySG",
+																																																																																																																																																																																																																											       			       "SecurityGroupIngress" : [
+																																																																																																																																																																																																																															                 { "CidrIp" : "110.227.250.143/32",
+																																																																																																																																																																																																																																		             "IpProtocol": "tcp",
+																																																																																																																																																																																																																																			                 "FromPort": "22",
+																																																																																																																																																																																																																																					             "ToPort": "22"
+
+																																																																																																																																																																																																																																						               },
+																																																																																																																																																																																																																																							       	  {
+																																																																																																																																																																																																																																									  	    "CidrIp" : "110.227.250.143/32",
+																																																																																																																																																																																																																																										                "IpProtocol": "tcp",
+																																																																																																																																																																																																																																												            "FromPort": "80",
+																																																																																																																																																																																																																																													                "ToPort": "80"
+
+																																																																																																																																																																																																																																															          },
+																																																																																																																																																																																																																																																  	  {
+																																																																																																																																																																																																																																																		  	    "CidrIp" : "110.227.250.143/32",
+																																																																																																																																																																																																																																																			                "IpProtocol": "tcp",
+																																																																																																																																																																																																																																																					            "FromPort": "443",
+																																																																																																																																																																																																																																																						                "ToPort": "443"
+
+																																																																																																																																																																																																																																																								          }
+
+																																																																																																																																																																																																																																																									   ],
+																																																																																																																																																																																																																																																									    "SecurityGroupEgress" : [
+																																																																																																																																																																																																																																																										              {
+																																																																																																																																																																																																																																																												      	    "CidrIp" : "0.0.0.0/0",
+																																																																																																																																																																																																																																																													                "IpProtocol": "tcp",
+																																																																																																																																																																																																																																																															            "FromPort": "0",
+																																																																																																																																																																																																																																																																                "ToPort": "65535"
+
+																																																																																																																																																																																																																																																																		          }
+
+																																																																																																																																																																																																																																																																			   ],
+																																																																																																																																																																																																																																																																			    "VpcId" : {"Ref":"MyVPC" }
+																																																																																																																																																																																																																																																																			     }
+																																																																																																																																																																																																																																																																			      }
+																																																																																																																																																																																																																																																																			       },
+
+
+
+																																																																																																																																																																																																																																																																			        "Outputs": {
+																																																																																																																																																																																																																																																																						"EC2PublicIp" : {
+																																																																																																																																																																																																																																																																									"Description" : "Public IP address of the newly created EC2 instance",
+																																																																																																																																																																																																																																																																											"Value": {
+																																																																																																																																																																																																																																																																															"Fn::GetAtt" : ["MyEc2Instance", "PublicIp"]
+																																																																																																																																																																																																																																																																																	}
+																																																																																																																																																																																																																																																																																		}
+																																																																																																																																																																																																																																																																																		 }
+
+																																																																																																																																																																																																																																																																																		 }
