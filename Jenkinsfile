@@ -4,7 +4,7 @@ pipeline {
 		stage ('build') {
 			steps { 
 			echo "build stage"
-			sh "bash jenranfile.bash"
+			sh "bash jenranfile.bash testfile" 
 			
 			
 			

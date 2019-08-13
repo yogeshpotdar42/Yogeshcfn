@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -ex
 
 filename=$1
 for i in 1 2 3 4; do 
