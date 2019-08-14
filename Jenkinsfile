@@ -16,9 +16,10 @@ pipeline {
 			
 		}
 		stage ('upload to s3'){
-		withAWS(credentials:'yogeshaws') {
+		steps {
+		withAWS(region:'us-east-1', credentials:'yogeshaws') {
         s3Upload(bucket:"yogesh-jenkinstest", path:'jenkinsupload', includePathPattern:'**/testfile*')
-
+              }
 }
 		} 
 		stage ('test: integration-&-quality') {
